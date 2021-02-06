@@ -45,9 +45,16 @@ export class CanvasHelper {
 		}
 	}
 
+	/**
+	 * @param image The twitter profile picture of the user 
+	 * @param userName The REAL NAME of the User Max: 30
+	 * @param tag the Tag of the User, (the @ stuff) Max: 15
+	 * @param text The text you want the user to say, Max: 280
+	 */
 	public static async tweet(image: baseImage, userName: string, tag: string, text: string): Promise<Buffer> {
 		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
-
+		if(!userName || !tag || !text) throw new Error("Some of the parameters have not been provided");
+	
 		try {
 			const base1 = await loadImage(join(__dirname, "../Assets/Images/Tweet/bg-1.png"));
 			const base2 = await loadImage(join(__dirname, "../Assets/Images/Tweet/bg-2.png"));
@@ -167,6 +174,36 @@ export class CanvasHelper {
 			ctx.closePath();
 			ctx.clip();
 			ctx.drawImage(inputImage, 30, 84, 64, 64);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param image The Image you want to apply the Tint to
+	 */
+	static async sepia(image: baseImage): Promise<Buffer> {
+		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+
+		try {
+			const base = await loadImage(image);
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+
+			const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+			for (let i = 0; i < imgData.data.length; i += 4) {
+				imgData.data[i] = imgData.data[i] * 0.393 + imgData.data[i + 1] * 0.769 + imgData.data[i + 2] * 0.189;
+				imgData.data[i + 1] = imgData.data[i] * 0.349 + imgData.data[i + 1] * 0.686 + imgData.data[i + 2] * 0.168;
+				imgData.data[i + 2] = imgData.data[i] * 0.272 + imgData.data[i + 1] * 0.534 + imgData.data[i + 2] * 0.131;
+			}
+
+			ctx.putImageData(imgData, 0, 0);
 
 			return canvas.toBuffer();
 		}
