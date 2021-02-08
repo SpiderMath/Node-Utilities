@@ -4,7 +4,7 @@ import { join } from "path";
 import { _Util } from "./_Util";
 const { formatNumberK } = _Util;
 import { canvasUtil } from "./canvasUtil";
-const { wrapText }  = canvasUtil;
+const { wrapText, invertColor: invertColour }  = canvasUtil;
 import * as moment from "moment";
 
 // Constants
@@ -17,6 +17,7 @@ registerFont(join(__dirname, "../Assets/Fonts/Noto-CJK.otf"), { family: "Noto" }
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Bold.ttf"), { family: "Noto", weight: "bold" });
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Emoji.ttf"), { family: "Noto" });
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Regular.ttf"), { family: "Noto" });
+registerFont(join(__dirname, "../Assets/Fonts/FiraCode-Bold.ttf"), { family: "Fira Code", style: "Bold" })
 
 // Exporting the Class
 export default class CanvasHelper {
@@ -363,4 +364,41 @@ export default class CanvasHelper {
 			throw new Error(err.message);
 		}
 	}
+
+	/**
+	 * @param colour Has to be a HTML5 Colour Code
+	 * @param width Width of the returned Image
+	 * @param height Height of the Returned image
+	 * @param displayHex Whether you want to have the HTML Code written on the canvas
+	 * @description Returns the image of a colour
+	 */
+	public static async color(colour: string = "#FF00FF", width: number = 1024, height: number = 1024, displayHex: boolean = false,): Promise<Buffer> {
+		if(isNaN(height) || isNaN(width)) throw new Error("Wrong type provided");
+		displayHex = !!displayHex;
+
+		try {
+			const canvas = createCanvas(width, height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.beginPath();
+			ctx.fillStyle = colour;
+			ctx.fillRect(0, 0, width, height);
+			ctx.closePath();
+
+			if(displayHex) {
+				const invertedColour = invertColour(colour);
+				ctx.font = "bold 64px Fira Code";
+
+				ctx.fillStyle = invertedColour;
+				ctx.fillText(colour.toUpperCase(), canvas.width / 3, canvas.height / 2);
+			}
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
+
+console.log(Object.keys(CanvasHelper));
