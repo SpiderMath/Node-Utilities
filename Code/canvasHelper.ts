@@ -7,7 +7,10 @@ import { canvasUtil } from "./canvasUtil";
 const { wrapText }  = canvasUtil;
 import * as moment from "moment";
 
+// Constants
 type baseImage = Buffer | string;
+const BuffStringErr = "Image not provided or invalid Image type";
+type stackTypes = "vertical" | "horizontal";
 
 // Registering Fonts
 registerFont(join(__dirname, "../Assets/Fonts/Noto-CJK.otf"), { family: "Noto" });
@@ -27,7 +30,7 @@ export default class CanvasHelper {
 	 * @param size Size has to be less than 20
 	 */
 	public static async wideImage(image: baseImage, size: number = 2): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -53,7 +56,7 @@ export default class CanvasHelper {
 	 * @description Draws an Image such that it looks as if the user has tweeted some text
 	 */
 	public static async tweet(image: baseImage, userName: string, handle: string, text: string): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 		if(!userName || !handle || !text) throw new Error("Some of the parameters have not been provided");
 	
 		try {
@@ -188,7 +191,7 @@ export default class CanvasHelper {
 	 * @description Applies Sepia Tint to the image
 	 */
 	public static async sepia(image: baseImage): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -219,7 +222,7 @@ export default class CanvasHelper {
 	 * @description Inverts the colour scheme of the image provided
 	 */
 	public static async invert(image: baseImage): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -252,7 +255,7 @@ export default class CanvasHelper {
 	 * @description Applies the greyscale filter on the Image
 	 */
 	public static async greyscale(image: baseImage): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -285,7 +288,7 @@ export default class CanvasHelper {
 	 * @description Pixelates an Image for you
 	 */
 	public static async pixelate(image: baseImage, pixels: number = 5): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("No image provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 		if(isNaN(pixels)) throw new Error("Pixelation Co-efficient is not a Number");
 		if (pixels < 1) pixels = 100;
         if (pixels > 100) pixels = 100;
@@ -310,8 +313,12 @@ export default class CanvasHelper {
 		}
 	}
 
+	/**
+	 * @param image Image which you want to be "circled"
+	 * @description Draws your Image as a Circle
+	 */
 	public static async circle(image: baseImage): Promise<Buffer> {
-		if(!this.isBuffString(image)) throw new Error("No Image provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error(BuffStringErr);
 		
 		try {
 			const base = await loadImage(image);
@@ -324,6 +331,31 @@ export default class CanvasHelper {
 			ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, 0, Math.PI * 2);
 			ctx.closePath();
 			ctx.fill();
+
+			return canvas.toBuffer();
+		}
+		catch (err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description Fuses two images together
+	 * @param firstImage The Image you want as base
+	 * @param secondImage The Image you want as overlay
+	 */
+	public static async fuse(firstImage: baseImage, secondImage: baseImage): Promise<Buffer> {
+		if(!this.isBuffString(firstImage) || !this.isBuffString(secondImage)) throw new Error(BuffStringErr);
+
+		try {
+			const base = await loadImage(firstImage);
+			const overlay = await loadImage(secondImage);
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.globalAlpha = 0.5;
+			ctx.drawImage(base, 0, 0);
+			ctx.drawImage(overlay, 0, 0, base.width, base.height);
 
 			return canvas.toBuffer();
 		}
