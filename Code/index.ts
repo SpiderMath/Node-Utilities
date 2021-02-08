@@ -3,10 +3,8 @@
  * todo: canvasUtil => For helping Development using canvas
 */
 
-import { CanvasHelper } from "./canvasHelper";
+import CanvasHelper from "./canvasHelper";
 
-class Main {
+export default class Main {
 	static CanvasHelper = CanvasHelper;
 }
-
-export { Main };

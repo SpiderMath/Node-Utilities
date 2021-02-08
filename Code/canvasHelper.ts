@@ -16,7 +16,7 @@ registerFont(join(__dirname, "../Assets/Fonts/Noto-Emoji.ttf"), { family: "Noto"
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Regular.ttf"), { family: "Noto" });
 
 // Exporting the Class
-export class CanvasHelper {
+export default class CanvasHelper {
 	private static isBuffString(input: any): boolean {
 		if(!input) return false;
 		return Buffer.isBuffer(input) || typeof input === "string";
@@ -48,12 +48,12 @@ export class CanvasHelper {
 	/**
 	 * @param image The twitter profile picture of the user 
 	 * @param userName The REAL NAME of the User Max: 30
-	 * @param tag the Tag of the User, (the @ stuff) Max: 15
+	 * @param handle the handle of the User, (the @ stuff) Max: 15
 	 * @param text The text you want the user to say, Max: 280
 	 */
-	public static async tweet(image: baseImage, userName: string, tag: string, text: string): Promise<Buffer> {
+	public static async tweet(image: baseImage, userName: string, handle: string, text: string): Promise<Buffer> {
 		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
-		if(!userName || !tag || !text) throw new Error("Some of the parameters have not been provided");
+		if(!userName || !handle || !text) throw new Error("Some of the parameters have not been provided");
 	
 		try {
 			const base1 = await loadImage(join(__dirname, "../Assets/Images/Tweet/bg-1.png"));
@@ -99,7 +99,7 @@ export class CanvasHelper {
 			ctx.font = '17px Noto';
 			ctx.fillStyle = '#8899a6';
 
-			ctx.fillText(`@${tag}`, 106, 111);
+			ctx.fillText(`@${handle}`, 106, 111);
 			ctx.fillStyle = 'white';
 			ctx.font = '23px Noto';
 
