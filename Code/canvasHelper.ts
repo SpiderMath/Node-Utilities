@@ -50,6 +50,7 @@ export default class CanvasHelper {
 	 * @param userName The REAL NAME of the User Max: 30
 	 * @param handle the handle of the User, (the @ stuff) Max: 15
 	 * @param text The text you want the user to say, Max: 280
+	 * @description Draws an Image such that it looks as if the user has tweeted some text
 	 */
 	public static async tweet(image: baseImage, userName: string, handle: string, text: string): Promise<Buffer> {
 		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
@@ -184,8 +185,9 @@ export default class CanvasHelper {
 
 	/**
 	 * @param image The Image you want to apply the Tint to
+	 * @description Applies Sepia Tint to the image
 	 */
-	static async sepia(image: baseImage): Promise<Buffer> {
+	public static async sepia(image: baseImage): Promise<Buffer> {
 		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
 
 		try {
@@ -208,6 +210,39 @@ export default class CanvasHelper {
 			return canvas.toBuffer();
 		}
 		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param image The image for which you want to invert the colours
+	 * @description Inverts the colour scheme of the image provided
+	 */
+	static async invert(image: baseImage): Promise<Buffer> {
+		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
+
+		try {
+			const base = await loadImage(image);
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+
+			const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+			for (let i = 0; i < imgData.data.length; i += 4) {
+				imgData.data[i] = 255 - imgData.data[i];
+				imgData.data[i + 1] = 255 - imgData.data[i + 1];
+				imgData.data[i + 2] = 255 - imgData.data[i + 2];
+				imgData.data[i + 3] = 255;
+			}
+
+			ctx.putImageData(imgData, 0, 0);
+
+
+			return canvas.toBuffer();
+		}
+		catch (err) {
 			throw new Error(err.message);
 		}
 	}
