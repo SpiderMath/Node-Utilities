@@ -248,7 +248,8 @@ export default class CanvasHelper {
 	}
 
 	/**
-	 * @param image
+	 * @param image Image which you want to apply the filter
+	 * @description Applies the greyscale filter on the Image
 	 */
 	public static async greyscale(image: baseImage): Promise<Buffer> {
 		if(!this.isBuffString(image)) throw new Error("Image not provided or invalid Image type");
@@ -275,6 +276,37 @@ export default class CanvasHelper {
 		}
 		catch (err) {
 			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param image The image you want to pixelate
+	 * @param pixels The co-efficient for pixelation
+	 * @description Pixelates an Image for you
+	 */
+	public static async pixelate(image: baseImage, pixels: number = 5): Promise<Buffer> {
+		if(!this.isBuffString) throw new Error("No image provided or invalid Image type");
+		if(isNaN(pixels)) throw new Error("Pixelation Co-efficient is not a Number");
+		if (pixels < 1) pixels = 100;
+        if (pixels > 100) pixels = 100;
+
+		try {
+			const base = await loadImage(image);
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			const pixel = pixels / 100;
+
+			ctx.drawImage(base, 0, 0, canvas.width * pixel, canvas.height * pixel);
+
+			ctx.imageSmoothingEnabled = false;
+
+			ctx.drawImage(canvas, 0, 0, canvas.width * pixel, canvas.height * pixel, 0, 0, canvas.width + 5, canvas.height + 5);
+
+			return canvas.toBuffer();
+		}
+		catch (err) {
+			throw new Error(err.message);	
 		}
 	}
 }
