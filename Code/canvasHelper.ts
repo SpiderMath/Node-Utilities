@@ -285,7 +285,7 @@ export default class CanvasHelper {
 	 * @description Pixelates an Image for you
 	 */
 	public static async pixelate(image: baseImage, pixels: number = 5): Promise<Buffer> {
-		if(!this.isBuffString) throw new Error("No image provided or invalid Image type");
+		if(!this.isBuffString(image)) throw new Error("No image provided or invalid Image type");
 		if(isNaN(pixels)) throw new Error("Pixelation Co-efficient is not a Number");
 		if (pixels < 1) pixels = 100;
         if (pixels > 100) pixels = 100;
@@ -307,6 +307,28 @@ export default class CanvasHelper {
 		}
 		catch (err) {
 			throw new Error(err.message);	
+		}
+	}
+
+	public static async circle(image: baseImage): Promise<Buffer> {
+		if(!this.isBuffString(image)) throw new Error("No Image provided or invalid Image type");
+		
+		try {
+			const base = await loadImage(image);
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+			ctx.globalCompositeOperation = "destination-in";
+			ctx.beginPath();
+			ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, 0, Math.PI * 2);
+			ctx.closePath();
+			ctx.fill();
+
+			return canvas.toBuffer();
+		}
+		catch (err) {
+			throw new Error(err.message);
 		}
 	}
 }
