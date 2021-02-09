@@ -507,4 +507,38 @@ export default class CanvasHelper {
 
 		}
 	}
+
+	/**
+	 * @description Returns a "There is a Monster under my Bed" meme
+	 * @param upper The person sleeping on the upper bunk
+	 * @param lower The person sleeping on the lower bunk
+	 */
+	public static async bed(upper, lower): Promise<Buffer> {
+		if(!this._isBuffString(upper) || !this._isBuffString(lower)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await read(join(__dirname, "../Assets/Images/bed.png"));
+			const Upper = await read(upper);
+			const Lower = await read(lower);
+
+			Upper.circle();
+			Lower.circle();
+
+			Lower.resize(70, 70);
+			Upper.resize(100, 100);
+			const UpperClone = Upper.clone().resize(70, 70);
+
+			base.composite(Upper, 25, 100);
+			base.composite(Upper, 25, 300);
+			base.composite(UpperClone, 53, 450);
+			base.composite(Lower, 53, 575);
+
+			const buffer = base.getBufferAsync("image/png");
+
+			return buffer;
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
