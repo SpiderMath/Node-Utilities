@@ -1,5 +1,6 @@
 // Importing the Modules
 import { createCanvas, loadImage, registerFont } from "canvas";
+import { read } from "jimp";
 import { join } from "path";
 import { _Util } from "./_Util";
 const { formatNumberK } = _Util;
@@ -448,6 +449,29 @@ export default class CanvasHelper {
 
 			return canvas.toBuffer();
 		} catch (err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param {baseImage} affected The imiage you want to be "affected"
+	 * @description "Affects" the image of the user
+	 */
+	public static async affect(affected): Promise<Buffer> {
+		if(!this._isBuffString(affected)) throw new Error(BuffStringErr);
+
+		try {
+			const base = await read(join(__dirname, "../Assets/Images/affect.png"));
+			const Affected = await read(affected);
+
+			Affected.resize(200, 157);
+			base.composite(Affected, 180, 383);
+
+			const buffer = base.getBufferAsync("image/png");
+
+			return buffer;
+		}
+		catch(err) {
 			throw new Error(err.message);
 		}
 	}
