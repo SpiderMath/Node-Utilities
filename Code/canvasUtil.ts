@@ -1,6 +1,6 @@
-import { CanvasRenderingContext2D } from "canvas";
+import { CanvasRenderingContext2D, Image } from "canvas";
 
-class canvasUtil {
+export default class canvasUtil {
 	static wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): Promise<Array<string>> {
 		if(typeof text !== "string" || isNaN(maxWidth)) throw new Error("Either the text inputted is not a string or maxWidth is NaN");
 
@@ -54,6 +54,20 @@ class canvasUtil {
 		return finalHex;
 	}
 
+	static centerImagePart(data: Image, maxWidth: number, maxHeight: number, widthOffset: number, heightOffset: number) {
+		let { width, height } = data;
+		if (width > maxWidth) {
+			const ratio = maxWidth / width;
+			width = maxWidth;
+			height *= ratio;
+		}
+		if (height > maxHeight) {
+			const ratio = maxHeight / height;
+			height = maxHeight;
+			width *= ratio;
+		}
+		const x = widthOffset + ((maxWidth / 2) - (width / 2));
+		const y = heightOffset + ((maxHeight / 2) - (height / 2));
+		return { x, y, width, height };
+	}
 }
-
-export { canvasUtil };

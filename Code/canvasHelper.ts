@@ -4,8 +4,8 @@ import { read } from "jimp";
 import { join } from "path";
 import { _Util } from "./_Util";
 const { formatNumberK } = _Util;
-import { canvasUtil } from "./canvasUtil";
-const { wrapText, invertColor: invertColour }  = canvasUtil;
+import canvasUtil from "./canvasUtil";
+const { wrapText, invertColor: invertColour, centerImagePart }  = canvasUtil;
 import * as moment from "moment";
 
 // Constants
@@ -536,6 +536,34 @@ export default class CanvasHelper {
 			const buffer = base.getBufferAsync("image/png");
 
 			return buffer;
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description Makes your Image a Bob Ross's Painting
+	 * @param painting The Image you want to transform into the painting
+	 */
+	public static async bobross(painting: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(painting)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/bobross.png"));
+			const Painting = await loadImage(painting);
+
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			const { x, y, width, height } = centerImagePart(Painting, 440, 440, 15, 20);
+
+			ctx.drawImage(Painting, x, y, width, height);
+			ctx.drawImage(base, 0, 0);
+			return canvas.toBuffer();
 		}
 		catch(err) {
 			throw new Error(err.message);
