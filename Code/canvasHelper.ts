@@ -569,4 +569,28 @@ export default class CanvasHelper {
 			throw new Error(err.message);
 		}
 	}
+
+	/**
+	 * @param confused The image of the person to be confused
+	 * @description Generates a confused stonk image
+	 */
+	public static async confusedStonk(confused: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(confused)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/confusedStonk.png"));
+			const ConfusedStonkUser = await loadImage(confused);
+
+			const canvas = createCanvas(1994, 1296);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+			ctx.drawImage(ConfusedStonkUser, 190, 70, 400, 400);
+	
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
