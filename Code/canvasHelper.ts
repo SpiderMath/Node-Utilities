@@ -32,7 +32,7 @@ export default class CanvasHelper {
 	 * @param size Size has to be less than 20
 	 */
 	public static async wideImage(image: baseImage, size: number = 2): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -58,7 +58,7 @@ export default class CanvasHelper {
 	 * @description Draws an Image such that it looks as if the user has tweeted some text
 	 */
 	public static async tweet(image: baseImage, userName: string, handle: string, text: string): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 		if(!userName || !handle || !text) throw new Error("Some of the parameters have not been provided");
 		if(typeof userName !== "string" || typeof handle !== "string" || typeof text !== "string") throw new Error("Expected string");
 
@@ -194,7 +194,7 @@ export default class CanvasHelper {
 	 * @description Applies Sepia Tint to the image
 	 */
 	public static async sepia(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -225,7 +225,7 @@ export default class CanvasHelper {
 	 * @description Inverts the colour scheme of the image provided
 	 */
 	public static async invert(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -258,7 +258,7 @@ export default class CanvasHelper {
 	 * @description Applies the greyscale filter on the Image
 	 */
 	public static async greyscale(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(image);
@@ -291,7 +291,7 @@ export default class CanvasHelper {
 	 * @description Pixelates an Image for you
 	 */
 	public static async pixelate(image: baseImage, pixels: number = 5): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 		if(isNaN(pixels)) throw new Error("Pixelation Co-efficient is not a Number");
 		if (pixels < 1) pixels = 100;
         if (pixels > 100) pixels = 100;
@@ -321,7 +321,7 @@ export default class CanvasHelper {
 	 * @description Draws your Image as a Circle
 	 */
 	public static async circle(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 		
 		try {
 			const base = await loadImage(image);
@@ -348,7 +348,7 @@ export default class CanvasHelper {
 	 * @param secondImage The Image you want as overlay
 	 */
 	public static async fuse(firstImage: baseImage, secondImage: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(firstImage) || !this._isBuffString(secondImage)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(firstImage) || !this._isBuffString(secondImage)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(firstImage);
@@ -408,7 +408,7 @@ export default class CanvasHelper {
 	 * @description Makes an Image spank another Image
 	 */
 	public static async spank(spanker: baseImage, spanked: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(spanker) || !this._isBuffString(spanked)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(spanker) || !this._isBuffString(spanked)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(join(__dirname, "../Assets/Images/spank.png"));
@@ -435,7 +435,7 @@ export default class CanvasHelper {
 	 * @description Puts an Image on the wall as a Advertisement
 	 */
 	public static async advertisement(advertisement: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(advertisement)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(advertisement)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(join(__dirname, "../Assets/Images/advertisement.png"));
@@ -458,7 +458,7 @@ export default class CanvasHelper {
 	 * @description "Affects" the image of the user
 	 */
 	public static async affect(affected): Promise<Buffer> {
-		if(!this._isBuffString(affected)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(affected)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await read(join(__dirname, "../Assets/Images/affect.png"));
@@ -473,6 +473,38 @@ export default class CanvasHelper {
 		}
 		catch(err) {
 			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param slapper The image you want to be the Slapper
+	 * @param slapped The image you want to be the Slapped
+	 * @description Makes one image slap another image
+	 */
+	public static async batslap(slapper, slapped): Promise<Buffer> {
+		if(!this._isBuffString(slapper) || !this._isBuffString(slapped)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await read(join(__dirname, "../Assets/Images/batslap.png"));
+			const Slapper = await read(slapper);
+			const Slapped = await read(slapped);
+
+			Slapper.circle();
+			Slapped.circle();
+
+			base.resize(1000, 500);
+			Slapper.resize(220, 220);
+			Slapped.resize(200, 200);
+
+			base.composite(Slapper, 350, 70);
+			base.composite(Slapped, 580, 260);
+
+			const buffer = await base.getBufferAsync("image/png");
+
+			return buffer;
+		}
+		catch(err) {
+
 		}
 	}
 }
