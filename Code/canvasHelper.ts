@@ -401,6 +401,11 @@ export default class CanvasHelper {
 		}
 	}
 
+	/**
+	 * @param spanker The image which you want the spank the other
+	 * @param spanked The image which you want to be spanked
+	 * @description Makes an Image spank another Image
+	 */
 	public static async spank(spanker: baseImage, spanked: baseImage): Promise<Buffer> {
 		if(!this._isBuffString(spanker) || !this._isBuffString(spanked)) throw new Error(BuffStringErr);
 
@@ -420,6 +425,29 @@ export default class CanvasHelper {
 			return canvas.toBuffer();
 		}
 		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @param advertisement The image you want to put as an Advertisement
+	 * @description Puts an Image on the wall as a Advertisement
+	 */
+	public static async advertisement(advertisement: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(advertisement)) throw new Error(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/advertisement.png"));
+			const advert = await loadImage(advertisement);
+
+			const canvas = createCanvas(550, 474);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+			ctx.drawImage(advert, 150, 75, 230, 230);
+
+			return canvas.toBuffer();
+		} catch (err) {
 			throw new Error(err.message);
 		}
 	}
