@@ -7,6 +7,7 @@ const { formatNumberK } = _Util;
 import canvasUtil from "./canvasUtil";
 const { wrapText, invertColor: invertColour, centerImagePart }  = canvasUtil;
 import * as moment from "moment";
+import * as GIFEncoder from "gifencoder";
 
 // Constants
 type baseImage = Buffer | string;
@@ -588,6 +589,42 @@ export default class CanvasHelper {
 			ctx.drawImage(ConfusedStonkUser, 190, 70, 400, 400);
 	
 			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description Lets you add some images which returns a GIF of them with the effect of them blinking
+	 * @param images The images which you want to be there to make a GIF
+	 */
+	public static async blink(images: baseImage[], delay: number = 1000): Promise<Buffer> {
+		if(!Array.isArray(images) || !images) throw new TypeError("images have to be an Array");
+		if(images.length <= 1) throw new RangeError("You need to provide at least 2 images for this method!");
+		if(isNaN(delay)) throw new TypeError("Delay is not a Number!");
+
+		try {
+			const gif = new GIFEncoder(480, 480);
+
+			gif.start();
+			gif.setRepeat(0);
+			gif.setDelay(delay);
+
+			const canvas = createCanvas(480, 480);
+			const ctx = canvas.getContext("2d");
+
+			for(const image of images) {
+				const base = await loadImage(image);
+				ctx.clearRect(0, 0, 480, 480);
+				ctx.drawImage(base, 0, 0, 480, 480);
+
+				gif.addFrame(ctx);
+			}
+
+			gif.finish();
+			//@ts-ignore
+			return gif.out.getData();
 		}
 		catch(err) {
 			throw new Error(err.message);

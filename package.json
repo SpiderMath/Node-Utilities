@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/SpiderMath/Node-Utilities#readme",
   "dependencies": {
+    "@types/gifencoder": "^2.0.0",
     "@types/node": "^14.14.25",
     "canvas": "^2.6.1",
+    "gifencoder": "^2.0.1",
     "jimp": "^0.16.1",
     "moment": "^2.29.1"
   }
