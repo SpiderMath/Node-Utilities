@@ -630,4 +630,28 @@ export default class CanvasHelper {
 			throw new Error(err.message);
 		}
 	}
+
+	/**
+	 * @description Oh this image? This is beautiful!
+	 * @param image The image you say is beautiful
+	 */
+	public static async beautiful(image: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/beautiful.png"));
+			const UserImage = await loadImage(image);
+			const canvas = createCanvas(376, 400);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+			ctx.drawImage(UserImage, 258, 28, 84, 95);
+        	ctx.drawImage(UserImage, 258, 229, 84, 95);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
