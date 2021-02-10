@@ -12,14 +12,14 @@ import * as GIFEncoder from "gifencoder";
 // Constants
 type baseImage = Buffer | string;
 const BuffStringErr = "Image not provided or invalid Image type";
-type stackTypes = "vertical" | "horizontal";
 
 // Registering Fonts
 registerFont(join(__dirname, "../Assets/Fonts/Noto-CJK.otf"), { family: "Noto" });
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Bold.ttf"), { family: "Noto", weight: "bold" });
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Emoji.ttf"), { family: "Noto" });
 registerFont(join(__dirname, "../Assets/Fonts/Noto-Regular.ttf"), { family: "Noto" });
-registerFont(join(__dirname, "../Assets/Fonts/FiraCode-Bold.ttf"), { family: "Fira Code", style: "Bold" })
+registerFont(join(__dirname, "../Assets/Fonts/FiraCode-Bold.ttf"), { family: "Fira Code", style: "bold" })
+registerFont(join(__dirname, "../Assets/Fonts/varela-round.regular.ttf"), { family: "Varela Round", style: "regular" })
 
 // Exporting the Class
 export default class CanvasHelper {
@@ -755,7 +755,7 @@ export default class CanvasHelper {
 	 * @description It is true mate you are wasted, generates a Wasted GTA5 Image
 	 * @param wastedImage The image of the wasted User
 	 */
-	public static async wasted(wastedImage: baseImage) {
+	public static async wasted(wastedImage: baseImage): Promise<Buffer> {
 		if(!this._isBuffString(wastedImage)) throw new TypeError(BuffStringErr);
 
 		try {
@@ -769,6 +769,54 @@ export default class CanvasHelper {
 			ctx.drawImage(base, 0, 0, 512, 512);
 
 			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description Applies fisheye effect to your image
+	 * @param playerName The name of the player to be ejected
+	 * @param color The colour of the ejected player
+	 */
+	public static async eject(playerName: string, image: baseImage): Promise<Buffer> {
+		if(!playerName || typeof playerName !== "string") throw new TypeError("Player name not provided or player name is not a string");
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/Imposter/imposter.png"));
+			const playerPicture = await loadImage(image);
+
+			const canvas = createCanvas(base.width, base.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.font = "regular 16px Varela Round";
+			ctx.fillStyle = "#DEDEDE";
+			ctx.shadowColor = "#000000";
+			ctx.shadowBlur = 5;
+			ctx.textAlign = "center";
+
+			const encoder = new GIFEncoder(canvas.width, canvas.height);
+			encoder.start();
+			encoder.setDelay(100);
+			encoder.setRepeat(0);
+			var ang = 0;
+			for (let i = 0; i < 15; i++) {
+				ctx.save();
+				ctx.drawImage(base, 0, 0, canvas.width, canvas.height);
+				ctx.translate(i * 70, canvas.height / 2.3);
+				ctx.rotate(Math.PI / 180 * (ang += 10));
+				ctx.translate(-(i * 70), -(canvas.height / 2.3));
+				ctx.drawImage(playerPicture, (i * 70), (canvas.height / 2.3), 50, 50);
+				ctx.restore();
+				// ctx.fillText(`${playerName} was The Imposter`, (canvas.width / 2), (canvas.height / 2));
+				encoder.addFrame(ctx);
+			}
+
+			encoder.finish();
+			// @ts-ignore
+			return encoder.out.getData();
 		}
 		catch(err) {
 			throw new Error(err.message);
