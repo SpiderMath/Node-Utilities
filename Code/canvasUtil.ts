@@ -1,4 +1,7 @@
-import { CanvasRenderingContext2D, Image } from "canvas";
+import { CanvasRenderingContext2D, createCanvas, Image, loadImage } from "canvas";
+import _Util from "./_Util";
+const { rgbToHex } = _Util;
+const BuffStringErr = "Image not provided or invalid Image type";
 
 export default class canvasUtil {
 	static wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): Promise<Array<string>> {
@@ -69,5 +72,31 @@ export default class canvasUtil {
 		const x = widthOffset + ((maxWidth / 2) - (width / 2));
 		const y = heightOffset + ((maxHeight / 2) - (height / 2));
 		return { x, y, width, height };
+	}
+
+	static async dominantColor(data: Buffer | string): Promise<object> {
+		if(!(Buffer.isBuffer(data) || typeof data === "string")) throw new Error(BuffStringErr);
+
+		try {
+			const img = await loadImage(data);
+			const canvas = createCanvas(250, 250);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(img, 0, 0, 1, 1);
+
+			const imageData = ctx.getImageData(0, 0, 1, 1).data;
+
+			return {
+				rgb: {
+					r: imageData[0],
+					g: imageData[1],
+					b: imageData[2],
+				},
+				hex: `#${rgbToHex(imageData[0], imageData[1], imageData[2])}`
+			}
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
 	}
 }

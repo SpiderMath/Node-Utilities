@@ -2,7 +2,7 @@
 import { createCanvas, loadImage, registerFont } from "canvas";
 import { read } from "jimp";
 import { join } from "path";
-import { _Util } from "./_Util";
+import _Util from "./_Util";
 const { formatNumberK } = _Util;
 import canvasUtil from "./canvasUtil";
 const { wrapText, invertColor: invertColour, centerImagePart }  = canvasUtil;
