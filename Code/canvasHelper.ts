@@ -727,6 +727,10 @@ export default class CanvasHelper {
 		}
 	}
 
+	/**
+	 * @param toBeTinted The Image you want to tint
+	 * @description Tints your Image Red
+	 */
 	public static async greenTint(toBeTinted: baseImage): Promise<Buffer> {
 		if(!this._isBuffString(toBeTinted)) throw new TypeError(BuffStringErr);
 
@@ -739,6 +743,30 @@ export default class CanvasHelper {
 			ctx.globalCompositeOperation = "color";
             ctx.fillStyle = "#00ff00";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description It is true mate you are wasted, generates a Wasted GTA5 Image
+	 * @param wastedImage The image of the wasted User
+	 */
+	public static async wasted(wastedImage: baseImage) {
+		if(!this._isBuffString(wastedImage)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/wasted.png"));
+			const unluckyGuy = await loadImage(wastedImage);
+
+			const canvas = createCanvas(512, 512);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(unluckyGuy, 0, 0, 512, 512);
+			ctx.drawImage(base, 0, 0, 512, 512);
 
 			return canvas.toBuffer();
 		}
