@@ -636,7 +636,7 @@ export default class CanvasHelper {
 	 * @param image The image you say is beautiful
 	 */
 	public static async beautiful(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const base = await loadImage(join(__dirname, "../Assets/Images/beautiful.png"));
@@ -660,7 +660,7 @@ export default class CanvasHelper {
 	 * @param image THe image you want to apply the filter to
 	 */
 	public static async rainbow(image: baseImage): Promise<Buffer> {
-		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+		if(!this._isBuffString(image)) throw new TypeError(BuffStringErr);
 
 		try {
 			const filter = await loadImage(join(__dirname, "../Assets/Images/rainbow.png"));
@@ -671,6 +671,30 @@ export default class CanvasHelper {
 
 			ctx.drawImage(UserImage, 0, 0);
 			ctx.drawImage(filter, 0, 0);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
+
+	/**
+	 * @description Generates a Worse than Hitler image for the image provided
+	 * @param hitlerCandidate The image of the person who is WORSE than Hilter
+	 */
+	public static async hitler(hitlerCandidate: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(hitlerCandidate)) throw new TypeError(BuffStringErr);
+
+		try {
+			const base = await loadImage(join(__dirname, "../Assets/Images/hitler.png"))
+			const HitlerCandidate = await loadImage(hitlerCandidate);
+
+			const canvas = createCanvas(HitlerCandidate.width, HitlerCandidate.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(base, 0, 0);
+			ctx.drawImage(HitlerCandidate, 46, 43, 140, 140);
 
 			return canvas.toBuffer();
 		}
