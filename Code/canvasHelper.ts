@@ -654,4 +654,28 @@ export default class CanvasHelper {
 			throw new Error(err.message);
 		}
 	}
+
+	/**
+	 * @description Applies the Rainbow filter on an Image
+	 * @param image THe image you want to apply the filter to
+	 */
+	public static async rainbow(image: baseImage): Promise<Buffer> {
+		if(!this._isBuffString(image)) throw new Error(BuffStringErr);
+
+		try {
+			const filter = await loadImage(join(__dirname, "../Assets/Images/rainbow.png"));
+			const UserImage = await loadImage(image);
+
+			const canvas = createCanvas(filter.width, filter.height);
+			const ctx = canvas.getContext("2d");
+
+			ctx.drawImage(UserImage, 0, 0);
+			ctx.drawImage(filter, 0, 0);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
