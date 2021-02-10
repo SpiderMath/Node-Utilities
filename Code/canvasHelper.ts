@@ -702,4 +702,28 @@ export default class CanvasHelper {
 			throw new Error(err.message);
 		}
 	}
+
+	/**
+	 * @param toBeTinted The Image you want to tint
+	 * @description Tints your Image Red
+	 */
+	public static async redTint(toBeTinted): Promise<Buffer> {
+		if(!this._isBuffString(toBeTinted)) throw new TypeError(BuffStringErr);
+
+		try {
+			const image = await loadImage(toBeTinted);
+			const canvas = createCanvas(image.width, image.height);
+			const ctx = canvas.getContext("2d");
+			ctx.drawImage(image, 0, 0);
+
+			ctx.globalCompositeOperation = "color";
+            ctx.fillStyle = "#ff0000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			return canvas.toBuffer();
+		}
+		catch(err) {
+			throw new Error(err.message);
+		}
+	}
 }
